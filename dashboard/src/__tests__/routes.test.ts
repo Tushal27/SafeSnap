@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 // Set env before importing routes (Vite replaces import.meta.env at build time,
 // but in tests we simulate it via the global defined in vite.config.ts)
