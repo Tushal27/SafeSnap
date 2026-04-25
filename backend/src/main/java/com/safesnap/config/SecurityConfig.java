@@ -43,7 +43,7 @@ public class SecurityConfig {
                 // WebSocket upgrade — token auth is handled by the handler itself
                 .requestMatchers(ApiRoutes.WS_ALERTS).permitAll()
                 // Health check — must be public for uptime monitors and keep-alive pings
-                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers(ApiRoutes.HEALTH).permitAll()
                 // Everything else requires a valid JWT
                 .anyRequest().authenticated()
             )

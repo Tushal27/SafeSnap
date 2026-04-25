@@ -33,4 +33,7 @@ public final class ApiRoutes {
 
     // WebSocket
     public static final String WS_ALERTS             = "/ws/alerts";
+
+    // Health
+    public static final String HEALTH                = "/health";
 }
