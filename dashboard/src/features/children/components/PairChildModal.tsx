@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Smartphone, RefreshCw, Copy, Check } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
-import { formatDateTime } from '@/lib/utils';
 import type { PairChildResponse } from '../types';
 
 interface PairChildModalProps {
@@ -23,19 +22,33 @@ export function PairChildModal({
 }: PairChildModalProps) {
   const [copied, setCopied] = useState(false);
 
-  // Trigger pairing when modal opens
+  // Keep a stable ref so the effect below doesn't re-run when mutateAsync
+  // gets a new reference on each render.
+  const onPairRef = useRef(onPair);
+  useEffect(() => { onPairRef.current = onPair; });
+
+  // Trigger pairing once when the modal opens (and hasn't paired yet).
   useEffect(() => {
     if (isOpen && !pairingData && !isPairing) {
-      void onPair();
+      void onPairRef.current();
     }
-  }, [isOpen, pairingData, isPairing, onPair]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleCopy = async () => {
     if (!pairingData) return;
-    await navigator.clipboard.writeText(pairingData.pairingCode);
+    await navigator.clipboard.writeText(pairingData.pairingToken);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  // Compute human-readable expiry from TTL seconds
+  const expiresAt = pairingData
+    ? new Date(Date.now() + pairingData.tokenTtlSeconds * 1000).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : null;
 
   const footer = (
     <Button variant="secondary" onClick={onClose}>
@@ -64,57 +77,54 @@ export function PairChildModal({
 
         {pairingData && !isPairing && (
           <>
-            {/* QR / device illustration box */}
-            <div className="neu-inset flex flex-col items-center gap-4 rounded-2xl p-8">
-              <div className="neu-icon flex h-16 w-16 items-center justify-center text-indigo-500">
-                <Smartphone className="h-8 w-8" />
-              </div>
+            {/* QR code (base64 image from backend) */}
+            <div className="neu-inset flex flex-col items-center gap-4 rounded-2xl p-6">
+              {pairingData.qrCodeBase64 ? (
+                <img
+                  src={`data:image/png;base64,${pairingData.qrCodeBase64}`}
+                  alt="Pairing QR code"
+                  className="h-40 w-40 rounded-xl"
+                />
+              ) : (
+                <div className="neu-icon flex h-16 w-16 items-center justify-center text-indigo-500">
+                  <Smartphone className="h-8 w-8" />
+                </div>
+              )}
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 text-center">
-                QR code data
+                Scan with the SafeSnap child app
               </p>
-              <code className="break-all neu-inset rounded-xl px-4 py-2 text-center text-xs font-mono text-gray-500 w-full">
-                {pairingData.qrData}
-              </code>
             </div>
 
-            {/* Manual pairing code */}
+            {/* Manual pairing token */}
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">
-                Manual pairing code
+                Or enter this code manually
               </p>
               <div className="neu-inset flex items-center gap-3 rounded-xl px-5 py-4">
-                <code className="flex-1 text-center font-mono text-2xl font-bold tracking-[0.4em] text-gray-600">
-                  {pairingData.pairingCode}
+                <code className="flex-1 text-center font-mono text-lg font-bold tracking-widest text-gray-600 break-all">
+                  {pairingData.pairingToken}
                 </code>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    void handleCopy();
-                  }}
+                  onClick={() => { void handleCopy(); }}
                   aria-label="Copy pairing code"
                   className={copied ? 'text-green-500' : 'text-gray-400 hover:text-indigo-500'}
                 >
-                  {copied ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>
-              <p className="mt-2 text-xs text-gray-400">
-                Expires {formatDateTime(pairingData.expiresAt)}
-              </p>
+              {expiresAt && (
+                <p className="mt-2 text-xs text-gray-400">Expires at {expiresAt}</p>
+              )}
             </div>
 
-            {/* Regenerate button */}
+            {/* Regenerate */}
             <Button
               variant="secondary"
               size="sm"
               leftIcon={<RefreshCw className="h-4 w-4" />}
-              onClick={() => {
-                void onPair();
-              }}
+              onClick={() => { void onPair(); }}
               isLoading={isPairing}
             >
               Generate new code

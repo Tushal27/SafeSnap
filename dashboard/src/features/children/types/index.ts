@@ -12,9 +12,9 @@ export const ChildSchema = z.object({
 export const ChildrenListSchema = z.array(ChildSchema);
 
 export const PairChildResponseSchema = z.object({
-  pairingCode: z.string(),
-  qrData: z.string(), // the data to encode in the QR
-  expiresAt: z.string(),
+  pairingToken: z.string(),
+  qrCodeBase64: z.string(),
+  tokenTtlSeconds: z.number(),
 });
 
 export type PairChildResponse = z.infer<typeof PairChildResponseSchema>;
