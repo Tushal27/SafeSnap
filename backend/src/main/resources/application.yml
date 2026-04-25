@@ -68,7 +68,7 @@ safesnap:
   pairing:
     token-ttl-seconds: ${PAIRING_TOKEN_TTL_SECONDS:300}
   cors:
-    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+    allowed-origins: ${ALLOWED_ORIGINS:https://safesnap.vercel.app}
 
 logging:
   level:
