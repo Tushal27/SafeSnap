@@ -28,7 +28,15 @@ const sizeClasses = {
 const FOCUSABLE_SELECTORS =
   'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-export function Modal({ isOpen, onClose, title, description, children, size = 'md', footer }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  description,
+  children,
+  size = 'md',
+  footer,
+}: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -52,7 +60,10 @@ export function Modal({ isOpen, onClose, title, description, children, size = 'm
   }, [isOpen]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape') { onClose(); return; }
+    if (e.key === 'Escape') {
+      onClose();
+      return;
+    }
     if (e.key !== 'Tab') return;
 
     const focusable = Array.from(
@@ -86,7 +97,7 @@ export function Modal({ isOpen, onClose, title, description, children, size = 'm
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-gray-900/30 backdrop-blur-sm"
         aria-hidden="true"
         onClick={onClose}
       />
@@ -94,20 +105,25 @@ export function Modal({ isOpen, onClose, title, description, children, size = 'm
       {/* Panel */}
       <div
         ref={dialogRef}
-        className={cn(
-          'relative z-10 w-full rounded-xl bg-white shadow-xl dark:bg-gray-900',
-          'border border-gray-200 dark:border-gray-700',
-          sizeClasses[size],
-        )}
+        className={cn('neu-card relative z-10 w-full', sizeClasses[size])}
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-gray-200 p-6 dark:border-gray-700">
+        <div
+          className="flex items-start justify-between p-6 pb-4"
+          style={{ borderBottom: '1px solid rgba(184,190,201,0.35)' }}
+        >
           <div>
-            <h2 id="modal-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h2
+              id="modal-title"
+              className="text-lg font-bold text-gray-600"
+            >
               {title}
             </h2>
             {description && (
-              <p id="modal-description" className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p
+                id="modal-description"
+                className="mt-1 text-sm text-gray-400"
+              >
                 {description}
               </p>
             )}
@@ -117,7 +133,7 @@ export function Modal({ isOpen, onClose, title, description, children, size = 'm
             size="sm"
             onClick={onClose}
             aria-label="Close modal"
-            className="ml-4 shrink-0"
+            className="ml-4 shrink-0 text-gray-400 hover:text-gray-600"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -128,7 +144,10 @@ export function Modal({ isOpen, onClose, title, description, children, size = 'm
 
         {/* Footer */}
         {footer && (
-          <div className="flex justify-end gap-3 border-t border-gray-200 p-6 dark:border-gray-700">
+          <div
+            className="flex justify-end gap-3 p-6 pt-4"
+            style={{ borderTop: '1px solid rgba(184,190,201,0.35)' }}
+          >
             {footer}
           </div>
         )}

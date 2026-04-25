@@ -9,7 +9,7 @@ interface SpinnerProps {
 const sizeClasses = {
   sm: 'h-4 w-4 border-2',
   md: 'h-8 w-8 border-2',
-  lg: 'h-12 w-12 border-4',
+  lg: 'h-12 w-12 border-[3px]',
 };
 
 export function Spinner({ size = 'md', className, label = 'Loading…' }: SpinnerProps) {
@@ -17,7 +17,7 @@ export function Spinner({ size = 'md', className, label = 'Loading…' }: Spinne
     <div role="status" className={cn('flex items-center justify-center', className)}>
       <div
         className={cn(
-          'animate-spin rounded-full border-current border-t-transparent text-blue-600 dark:text-blue-400',
+          'animate-spin rounded-full border-indigo-400 border-t-transparent',
           sizeClasses[size],
         )}
       />

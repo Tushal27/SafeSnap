@@ -1,7 +1,5 @@
 import { Smartphone, Wifi, WifiOff } from 'lucide-react';
 import type { Child } from '@/types';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { formatRelative } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
@@ -11,15 +9,13 @@ interface ChildStatusCardProps {
 
 export function ChildStatusCard({ child }: ChildStatusCardProps) {
   return (
-    <Card className="transition-shadow hover:shadow-md">
-      <CardContent className="flex items-start gap-4 p-5">
-        {/* Icon */}
+    <div className="neu-card p-5 transition-all duration-200 hover:scale-[1.02]">
+      <div className="flex items-start gap-4">
+        {/* Device icon in neu-icon circle */}
         <div
           className={cn(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
-            child.isOnline
-              ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-              : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500',
+            'neu-icon flex h-12 w-12 shrink-0 items-center justify-center',
+            child.isOnline ? 'text-indigo-500' : 'text-gray-400',
           )}
           aria-hidden="true"
         >
@@ -27,35 +23,52 @@ export function ChildStatusCard({ child }: ChildStatusCardProps) {
         </div>
 
         {/* Info */}
-        <div className="min-w-0 flex-1 space-y-1">
+        <div className="min-w-0 flex-1 space-y-1.5">
+          {/* Name row with status badge */}
           <div className="flex items-center gap-2">
-            <h3 className="truncate font-medium text-gray-900 dark:text-gray-100">
-              {child.deviceName}
-            </h3>
+            <h3 className="truncate font-bold text-gray-600">{child.deviceName}</h3>
+          </div>
+
+          {/* Online / offline pill */}
+          <div className="inline-flex items-center gap-1.5 neu-inset px-3 py-0.5">
             {child.isOnline ? (
-              <Badge variant="success" className="gap-1">
-                <Wifi className="h-3 w-3" />
-                Online
-              </Badge>
+              <>
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full bg-green-400 animate-pulse"
+                  aria-hidden="true"
+                />
+                <span className="text-xs font-semibold text-green-600 flex items-center gap-1">
+                  <Wifi className="h-3 w-3" />
+                  Online
+                </span>
+              </>
             ) : (
-              <Badge variant="default" className="gap-1">
-                <WifiOff className="h-3 w-3" />
-                Offline
-              </Badge>
+              <>
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full bg-gray-400"
+                  aria-hidden="true"
+                />
+                <span className="text-xs font-semibold text-gray-400 flex items-center gap-1">
+                  <WifiOff className="h-3 w-3" />
+                  Offline
+                </span>
+              </>
             )}
           </div>
 
-          <p className="truncate text-xs text-gray-400 dark:text-gray-500">
-            ID: {child.deviceId}
+          {/* Device ID */}
+          <p className="truncate text-xs text-gray-400 font-mono">
+            {child.deviceId}
           </p>
 
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          {/* Last seen */}
+          <p className="text-xs text-gray-400">
             {child.lastSeenAt
               ? `Last seen ${formatRelative(child.lastSeenAt)}`
               : 'Never connected'}
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

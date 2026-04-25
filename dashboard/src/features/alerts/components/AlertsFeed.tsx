@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, ShieldAlert } from 'lucide-react';
 import { useAlerts } from '../hooks/useAlerts';
 import { AlertCard } from './AlertCard';
 import { AlertDetailModal } from './AlertDetailModal';
@@ -15,8 +15,15 @@ export function AlertsFeed({ childId }: AlertsFeedProps) {
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
 
-  const { alerts, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, acknowledge } =
-    useAlerts({ childId });
+  const {
+    alerts,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    acknowledge,
+  } = useAlerts({ childId });
 
   const handleAcknowledge = async (id: string) => {
     setAcknowledgingId(id);
@@ -29,17 +36,25 @@ export function AlertsFeed({ childId }: AlertsFeedProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-16">
+      <div className="neu-inset flex flex-col items-center justify-center gap-3 rounded-2xl py-16">
         <Spinner size="lg" label="Loading alerts…" />
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          Loading alerts…
+        </p>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center gap-3 py-16 text-center">
-        <AlertTriangle className="h-10 w-10 text-red-400" />
-        <p className="text-gray-600 dark:text-gray-400">Failed to load alerts.</p>
+      <div className="neu-inset flex flex-col items-center gap-4 rounded-2xl py-16 text-center">
+        <div className="neu-icon flex h-14 w-14 items-center justify-center text-red-400">
+          <AlertTriangle className="h-7 w-7" />
+        </div>
+        <div>
+          <p className="font-bold text-gray-600">Failed to load alerts</p>
+          <p className="mt-1 text-sm text-gray-400">Check your connection and try again.</p>
+        </div>
         <Button variant="secondary" size="sm">
           Retry
         </Button>
@@ -49,12 +64,14 @@ export function AlertsFeed({ childId }: AlertsFeedProps) {
 
   if (alerts.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 py-16 text-center">
-        <AlertTriangle className="h-10 w-10 text-gray-300 dark:text-gray-600" />
-        <p className="font-medium text-gray-500 dark:text-gray-400">No alerts found</p>
-        <p className="text-sm text-gray-400 dark:text-gray-500">
-          All clear — no flagged content detected.
-        </p>
+      <div className="neu-inset flex flex-col items-center gap-4 rounded-2xl py-16 text-center">
+        <div className="neu-icon flex h-14 w-14 items-center justify-center text-indigo-300">
+          <ShieldAlert className="h-7 w-7" />
+        </div>
+        <div>
+          <p className="font-bold text-gray-600">All clear</p>
+          <p className="mt-1 text-sm text-gray-400">No flagged content detected.</p>
+        </div>
       </div>
     );
   }
@@ -78,7 +95,9 @@ export function AlertsFeed({ childId }: AlertsFeedProps) {
           <Button
             variant="secondary"
             isLoading={isFetchingNextPage}
-            onClick={() => { void fetchNextPage(); }}
+            onClick={() => {
+              void fetchNextPage();
+            }}
             leftIcon={<RefreshCw className="h-4 w-4" />}
           >
             Load more

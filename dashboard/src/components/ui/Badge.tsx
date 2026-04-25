@@ -1,6 +1,6 @@
 import { type HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
-import { SEVERITY_BADGE_CLASSES, SEVERITY_LABELS } from '@/constants';
+import { SEVERITY_LABELS } from '@/constants';
 import type { SeverityLevel } from '@/types';
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'error' | 'info';
@@ -10,27 +10,55 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   severity?: SeverityLevel;
 }
 
-const variantClasses: Record<BadgeVariant, string> = {
-  default: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-  error: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-  info: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+const severityConfig: Record<SeverityLevel, { dot: string; text: string; label: string }> = {
+  LOW: {
+    dot: 'bg-yellow-400',
+    text: 'text-yellow-600',
+    label: 'Low',
+  },
+  MEDIUM: {
+    dot: 'bg-orange-400',
+    text: 'text-orange-500',
+    label: 'Medium',
+  },
+  HIGH: {
+    dot: 'bg-red-400',
+    text: 'text-red-500',
+    label: 'High',
+  },
+  CRITICAL: {
+    dot: 'bg-red-700',
+    text: 'text-red-700 font-bold',
+    label: 'Critical',
+  },
+};
+
+const variantConfig: Record<BadgeVariant, { dot: string; text: string }> = {
+  default: { dot: 'bg-gray-400', text: 'text-gray-500' },
+  success: { dot: 'bg-green-400', text: 'text-green-600' },
+  warning: { dot: 'bg-yellow-400', text: 'text-yellow-600' },
+  error: { dot: 'bg-red-400', text: 'text-red-500' },
+  info: { dot: 'bg-indigo-400', text: 'text-indigo-600' },
 };
 
 export function Badge({ variant = 'default', severity, className, children, ...rest }: BadgeProps) {
-  const colorClass = severity ? SEVERITY_BADGE_CLASSES[severity] : variantClasses[variant];
+  const config = severity ? severityConfig[severity] : variantConfig[variant];
+  const displayLabel = severity ? SEVERITY_LABELS[severity] : undefined;
 
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-        colorClass,
+        'neu-inset inline-flex items-center gap-1.5 px-3 py-0.5 text-xs font-semibold',
+        config.text,
         className,
       )}
       {...rest}
     >
-      {severity && !children ? SEVERITY_LABELS[severity] : children}
+      <span
+        className={cn('h-1.5 w-1.5 shrink-0 rounded-full', config.dot)}
+        aria-hidden="true"
+      />
+      {severity && !children ? displayLabel : children}
     </span>
   );
 }

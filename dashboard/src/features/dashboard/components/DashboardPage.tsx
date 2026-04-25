@@ -4,120 +4,134 @@ import { StatsChart } from './StatsChart';
 import { ChildStatusCard } from './ChildStatusCard';
 import { useChildren } from '@/features/children/hooks/useChildren';
 import { AlertsFeed } from '@/features/alerts/components/AlertsFeed';
-import { useWebSocket } from '@/hooks/useWebSocket';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
-interface StatCardProps {
+interface StatTileProps {
   label: string;
   value: number | string;
   icon: React.ReactNode;
-  highlight?: boolean;
+  accent?: boolean;
 }
 
-function StatCard({ label, value, icon, highlight = false }: StatCardProps) {
+function StatTile({ label, value, icon, accent = false }: StatTileProps) {
   return (
-    <Card className={cn('flex items-center gap-4 p-5', highlight && 'border-blue-200 dark:border-blue-800')}>
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+    <div className="neu-card p-6 flex flex-col gap-4">
+      <div
+        className={cn(
+          'neu-icon flex h-12 w-12 items-center justify-center',
+          accent ? 'text-indigo-500' : 'text-gray-500',
+        )}
+        aria-hidden="true"
+      >
         {icon}
       </div>
       <div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
-        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+        <p className="text-3xl font-bold text-gray-600 leading-none">{value}</p>
+        <p className="mt-1.5 text-xs font-semibold uppercase tracking-widest text-gray-400">
+          {label}
+        </p>
       </div>
-    </Card>
+    </div>
   );
 }
-
-const STATUS_DOT: Record<'connected' | 'disconnected' | 'connecting', string> = {
-  connected: 'bg-green-500',
-  disconnected: 'bg-gray-400',
-  connecting: 'bg-yellow-400 animate-pulse',
-};
 
 export function DashboardPage() {
   const { weeklyStats, isLoadingStats, ackRate } = useDashboardData();
   const { children } = useChildren();
-  const { connectionStatus } = useWebSocket();
+  const { parent } = useAuth();
 
   const onlineCount = children.filter((c) => c.isOnline).length;
 
+  const greeting = (() => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  })();
+
   return (
-    <div className="space-y-8">
-      {/* Real-time status bar */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Overview</h1>
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-          <span
-            className={cn('h-2 w-2 rounded-full', STATUS_DOT[connectionStatus])}
-            aria-hidden="true"
-          />
-          {connectionStatus === 'connected' ? 'Live alerts active' : connectionStatus}
+    <div className="mx-auto max-w-7xl px-4 py-8 space-y-8">
+      {/* Greeting */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-600">
+          {greeting}, {parent?.email?.split('@')[0] ?? 'parent'} 👋
+        </h1>
+        <p className="mt-1 text-sm text-gray-400">
+          Here's your child safety overview for this week.
+        </p>
+      </div>
+
+      {/* ── Stat tiles ── */}
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <StatTile
+          label="Scanned this week"
+          value={weeklyStats?.totalScanned ?? '—'}
+          icon={<Scan className="h-5 w-5" />}
+        />
+        <StatTile
+          label="Flagged this week"
+          value={weeklyStats?.flaggedCount ?? '—'}
+          icon={<Flag className="h-5 w-5" />}
+          accent={!!weeklyStats && weeklyStats.flaggedCount > 0}
+        />
+        <StatTile
+          label="Acknowledgement rate"
+          value={weeklyStats ? `${ackRate}%` : '—'}
+          icon={<CheckCircle2 className="h-5 w-5" />}
+          accent
+        />
+        <StatTile
+          label="Devices online"
+          value={`${onlineCount} / ${children.length}`}
+          icon={<Wifi className="h-5 w-5" />}
+        />
+      </div>
+
+      {/* ── Chart + Live Alerts side-by-side ── */}
+      <div className="grid gap-6 lg:grid-cols-5">
+        {/* Weekly Chart — 3 cols */}
+        <div className="neu-card p-6 lg:col-span-3">
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-600">Flagged Content — This Week</h2>
+            <span className="neu-inset px-3 py-0.5 text-xs font-semibold text-indigo-500">
+              By Severity
+            </span>
+          </div>
+          <StatsChart stats={weeklyStats} isLoading={isLoadingStats} />
+        </div>
+
+        {/* Live Alerts — 2 cols */}
+        <div className="neu-card p-6 lg:col-span-2 flex flex-col">
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-600">Live Alerts</h2>
+            <span className="flex items-center gap-1.5 neu-inset px-3 py-0.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              <span className="text-xs font-semibold text-indigo-500">Real-time</span>
+            </span>
+          </div>
+          <div className="flex-1 overflow-y-auto max-h-96 pr-1 space-y-2">
+            <AlertsFeed />
+          </div>
         </div>
       </div>
 
-      {/* Quick stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="Scanned this week"
-          value={weeklyStats?.totalScanned ?? '—'}
-          icon={<Scan className="h-6 w-6" />}
-        />
-        <StatCard
-          label="Flagged this week"
-          value={weeklyStats?.flaggedCount ?? '—'}
-          icon={<Flag className="h-6 w-6" />}
-          highlight={!!weeklyStats && weeklyStats.flaggedCount > 0}
-        />
-        <StatCard
-          label="Acknowledgement rate"
-          value={weeklyStats ? `${ackRate}%` : '—'}
-          icon={<CheckCircle2 className="h-6 w-6" />}
-        />
-        <StatCard
-          label="Devices online"
-          value={`${onlineCount} / ${children.length}`}
-          icon={<Wifi className="h-6 w-6" />}
-        />
-      </div>
-
-      {/* Weekly chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Flagged content — this week</CardTitle>
-          <Badge variant="info">By severity</Badge>
-        </CardHeader>
-        <CardContent>
-          <StatsChart stats={weeklyStats} isLoading={isLoadingStats} />
-        </CardContent>
-      </Card>
-
-      {/* Children status */}
+      {/* ── Child Devices ── */}
       {children.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Child Devices</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {children.map((child) => (
-                <ChildStatusCard key={child.id} child={child} />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="neu-card p-6">
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-600">Child Devices</h2>
+            <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+              {onlineCount}/{children.length} online
+            </span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {children.map((child) => (
+              <ChildStatusCard key={child.id} child={child} />
+            ))}
+          </div>
+        </div>
       )}
-
-      {/* Recent alerts */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Alerts</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AlertsFeed />
-        </CardContent>
-      </Card>
     </div>
   );
 }
