@@ -1,24 +1,20 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import { RegisterRequestSchema, type RegisterRequest } from '../types';
 import { useAuth } from '../hooks/useAuth';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card, CardContent } from '@/components/ui/Card';
 import { extractErrorMessage } from '@/lib/utils';
 import { APP_NAME } from '@/constants';
 
 export function RegisterForm() {
   const navigate = useNavigate();
   const { register: registerParent, isRegisterPending, registerError } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterRequest>({
+  const { register, handleSubmit, formState: { errors } } = useForm<RegisterRequest>({
     resolver: zodResolver(RegisterRequestSchema),
   });
 
@@ -28,84 +24,96 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-950">
+    <div className="min-h-screen flex items-center justify-center px-4 neu-page">
       <div className="w-full max-w-md space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600">
-            <ShieldCheck className="h-8 w-8 text-white" />
+
+        <div className="flex flex-col items-center gap-4">
+          <div className="neu-icon w-20 h-20 flex items-center justify-center">
+            <ShieldCheck className="w-10 h-10 text-indigo-500" />
           </div>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            {APP_NAME}
-          </h1>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Create your parent account
-          </p>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-600 tracking-tight">{APP_NAME}</h1>
+            <p className="text-gray-400 mt-1 text-sm">Create your parent account</p>
+          </div>
         </div>
 
-        <Card>
-          <CardContent>
-            <form
-              onSubmit={(e) => { void handleSubmit(onSubmit)(e); }}
-              className="space-y-5"
-              noValidate
-            >
-              <Input
-                label="Email address"
-                type="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                error={errors.email?.message}
-                {...register('email')}
-              />
+        <div className="neu-card p-8 space-y-5">
+          <NeuField label="Email address" error={errors.email?.message}
+            icon={<Mail className="w-4 h-4 text-gray-400" />}>
+            <input type="email" autoComplete="email" placeholder="you@example.com"
+              className="neu-input w-full px-4 py-3 pl-10 text-sm text-gray-600 placeholder:text-gray-400"
+              {...register('email')} />
+          </NeuField>
 
-              <Input
-                label="Password"
-                type="password"
-                autoComplete="new-password"
-                placeholder="••••••••"
-                helperText="Min. 8 chars, one uppercase, one number"
-                error={errors.password?.message}
-                {...register('password')}
-              />
+          <NeuField label="Password" error={errors.password?.message}
+            hint="Min 8 chars, one uppercase, one number"
+            icon={<Lock className="w-4 h-4 text-gray-400" />}
+            action={
+              <button type="button" onClick={() => setShowPassword(v => !v)} className="text-gray-400 hover:text-indigo-500">
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            }>
+            <input type={showPassword ? 'text' : 'password'} autoComplete="new-password"
+              placeholder="••••••••"
+              className="neu-input w-full px-4 py-3 pl-10 pr-10 text-sm text-gray-600 placeholder:text-gray-400"
+              {...register('password')} />
+          </NeuField>
 
-              <Input
-                label="Confirm password"
-                type="password"
-                autoComplete="new-password"
-                placeholder="••••••••"
-                error={errors.confirmPassword?.message}
-                {...register('confirmPassword')}
-              />
+          <NeuField label="Confirm password" error={errors.confirmPassword?.message}
+            icon={<Lock className="w-4 h-4 text-gray-400" />}
+            action={
+              <button type="button" onClick={() => setShowConfirm(v => !v)} className="text-gray-400 hover:text-indigo-500">
+                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            }>
+            <input type={showConfirm ? 'text' : 'password'} autoComplete="new-password"
+              placeholder="••••••••"
+              className="neu-input w-full px-4 py-3 pl-10 pr-10 text-sm text-gray-600 placeholder:text-gray-400"
+              {...register('confirmPassword')} />
+          </NeuField>
 
-              {registerError && (
-                <p role="alert" className="text-sm text-red-600 dark:text-red-400">
-                  {extractErrorMessage(registerError, 'Registration failed. Please try again.')}
-                </p>
-              )}
+          {registerError && (
+            <div className="neu-inset px-4 py-3">
+              <p className="text-sm text-red-400 text-center">{extractErrorMessage(registerError)}</p>
+            </div>
+          )}
 
-              <Button
-                type="submit"
-                className="w-full"
-                isLoading={isRegisterPending}
-                disabled={isRegisterPending}
-              >
-                Create account
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+          <button type="button" disabled={isRegisterPending}
+            onClick={() => { void handleSubmit(onSubmit)(); }}
+            className="neu-btn-primary w-full py-3 text-white font-semibold text-sm tracking-wide disabled:opacity-60 disabled:cursor-not-allowed">
+            {isRegisterPending ? 'Creating account…' : 'Create account'}
+          </button>
+        </div>
 
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-center text-sm text-gray-400">
           Already have an account?{' '}
-          <Link
-            to="/login"
-            className="font-medium text-blue-600 hover:underline dark:text-blue-400"
-          >
-            Sign in
-          </Link>
+          <Link to="/login" className="text-indigo-500 font-medium hover:text-indigo-600">Sign in</Link>
         </p>
       </div>
+    </div>
+  );
+}
+
+interface NeuFieldProps {
+  label: string;
+  error?: string;
+  hint?: string;
+  icon: ReactNode;
+  action?: ReactNode;
+  children: ReactNode;
+}
+
+function NeuField({ label, error, hint, icon, action, children }: NeuFieldProps) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest pl-1">{label}</label>
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">{icon}</span>
+        {children}
+        {action && <span className="absolute right-3 top-1/2 -translate-y-1/2">{action}</span>}
+      </div>
+      {error && <p className="text-xs text-red-400 pl-1">{error}</p>}
+      {!error && hint && <p className="text-xs text-gray-400 pl-1">{hint}</p>}
     </div>
   );
 }

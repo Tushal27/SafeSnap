@@ -3,8 +3,118 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --neu-bg: #e8ecf1;
+    --neu-shadow-dark: #b8bec9;
+    --neu-shadow-light: #ffffff;
+  }
+
   body {
-    @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+    background-color: var(--neu-bg);
+    @apply text-gray-700;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  /* Page background */
+  .neu-page {
+    background-color: var(--neu-bg);
+    min-height: 100vh;
+  }
+
+  /* Raised card — floats above the surface */
+  .neu-card {
+    background: var(--neu-bg);
+    box-shadow:
+      8px 8px 20px var(--neu-shadow-dark),
+      -8px -8px 20px var(--neu-shadow-light);
+    border-radius: 20px;
+  }
+
+  /* Inset — pressed into the surface */
+  .neu-inset {
+    background: var(--neu-bg);
+    box-shadow:
+      inset 4px 4px 10px var(--neu-shadow-dark),
+      inset -4px -4px 10px var(--neu-shadow-light);
+    border-radius: 12px;
+  }
+
+  /* Pill button — raised, clickable */
+  .neu-btn {
+    background: var(--neu-bg);
+    box-shadow:
+      5px 5px 12px var(--neu-shadow-dark),
+      -5px -5px 12px var(--neu-shadow-light);
+    border-radius: 50px;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .neu-btn:hover {
+    box-shadow:
+      3px 3px 8px var(--neu-shadow-dark),
+      -3px -3px 8px var(--neu-shadow-light);
+    transform: translateY(1px);
+  }
+
+  .neu-btn:active {
+    box-shadow:
+      inset 3px 3px 8px var(--neu-shadow-dark),
+      inset -3px -3px 8px var(--neu-shadow-light);
+    transform: translateY(2px);
+  }
+
+  /* Primary button — coloured */
+  .neu-btn-primary {
+    background: linear-gradient(145deg, #6366f1, #4f46e5);
+    box-shadow:
+      5px 5px 12px var(--neu-shadow-dark),
+      -5px -5px 12px var(--neu-shadow-light);
+    border-radius: 50px;
+    transition: box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s;
+  }
+
+  .neu-btn-primary:hover {
+    opacity: 0.92;
+    transform: translateY(1px);
+    box-shadow:
+      3px 3px 8px var(--neu-shadow-dark),
+      -3px -3px 8px var(--neu-shadow-light);
+  }
+
+  .neu-btn-primary:active {
+    transform: translateY(2px);
+    box-shadow:
+      inset 3px 3px 8px rgba(0,0,0,0.2),
+      inset -3px -3px 8px rgba(255,255,255,0.1);
+  }
+
+  /* Input field */
+  .neu-input {
+    background: var(--neu-bg);
+    box-shadow:
+      inset 3px 3px 8px var(--neu-shadow-dark),
+      inset -3px -3px 8px var(--neu-shadow-light);
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .neu-input:focus {
+    box-shadow:
+      inset 4px 4px 10px var(--neu-shadow-dark),
+      inset -4px -4px 10px var(--neu-shadow-light),
+      0 0 0 2px #6366f1;
+  }
+
+  /* Icon circle */
+  .neu-icon {
+    background: var(--neu-bg);
+    box-shadow:
+      6px 6px 14px var(--neu-shadow-dark),
+      -6px -6px 14px var(--neu-shadow-light);
+    border-radius: 50%;
   }
 }
