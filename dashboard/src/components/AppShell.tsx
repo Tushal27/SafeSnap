@@ -37,7 +37,7 @@ export function AppShell() {
   return (
     <div className="neu-page min-h-screen">
       {/* ── Top Navigation ── */}
-      <nav className="neu-card mx-4 mt-4 px-6 py-3 flex items-center justify-between rounded-[20px]">
+      <nav className="neu-card mx-4 mt-4 px-6 py-3 flex items-center justify-between overflow-hidden">
         {/* Brand */}
         <button
           onClick={() => navigate('/dashboard')}
@@ -79,7 +79,7 @@ export function AppShell() {
 
           {/* Logout */}
           <button
-            onClick={logout}
+            onClick={() => { logout(); navigate('/login'); }}
             className="neu-btn flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold text-gray-500 hover:text-red-500 transition-colors ml-1"
             aria-label="Sign out"
           >
