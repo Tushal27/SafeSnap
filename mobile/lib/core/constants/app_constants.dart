@@ -8,7 +8,7 @@ abstract final class AppConstants {
   /// Base URL for the SafeSnap backend.  Override via --dart-define=BASE_URL=…
   static const String baseUrl = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'https://api.safesnap.app/v1',
+    defaultValue: 'https://safesnap-backend.onrender.com',
   );
 
   /// Default connection timeout in seconds.
