@@ -4,6 +4,16 @@
 
 SafeSnap is a full-stack parental control system built around a single privacy guarantee: the AI runs entirely on the child's phone, and only anonymised metadata is ever transmitted. No image bytes. No thumbnails. No cloud vision APIs. Just a SHA-256 hash, a severity score, and a timestamp.
 
+## Live demo
+
+| | URL |
+|---|---|
+| **Parent dashboard** | https://safesnap.vercel.app |
+| **Backend API** | https://safesnap-backend.onrender.com |
+| **Health check** | https://safesnap-backend.onrender.com/health |
+
+> The backend runs on Render's free tier and may take ~30 seconds to wake on first request.
+
 ---
 
 ## Why this architecture matters
@@ -75,13 +85,20 @@ SafeSnap/
 
 ## Quick start
 
-### Prerequisites
+### Try it now (no setup)
+
+Open **https://safesnap.vercel.app**, create a parent account and explore the dashboard.  
+The backend API is live at **https://safesnap-backend.onrender.com**.
+
+### Run locally
+
+#### Prerequisites
 - Docker + Docker Compose
 - Node 20+ (dashboard)
 - Flutter 3.22+ (mobile)
 - Java 17+ (if running backend outside Docker)
 
-### 1. Start backend infrastructure
+#### 1. Start backend infrastructure
 
 ```bash
 cp .env.example .env
@@ -93,7 +110,7 @@ docker compose up -d
 
 The API will be at `http://localhost:8080`.
 
-### 2. Start the parent dashboard
+#### 2. Start the parent dashboard
 
 ```bash
 cd dashboard
@@ -104,17 +121,18 @@ npm run dev
 
 Dashboard at `http://localhost:5173`.
 
-### 3. Run the Flutter app
+#### 3. Run the Flutter app
 
 ```bash
 cd mobile
 flutter pub get
-flutter run
+# Point at the live backend or your local one:
+flutter run --dart-define=BASE_URL=https://safesnap-backend.onrender.com
 ```
 
 For background scanning, run on a real device in release mode:
 ```bash
-flutter run --release
+flutter build apk --dart-define=BASE_URL=https://safesnap-backend.onrender.com
 ```
 
 ---
