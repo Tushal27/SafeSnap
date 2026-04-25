@@ -58,7 +58,8 @@ export function useAuth(): UseAuthReturn {
 
   const handleAuthSuccess = useCallback((response: AuthResponse) => {
     setTokens(response.accessToken, response.refreshToken);
-    setState({ parent: response.parent });
+    // Parse parent info from JWT claims since backend returns flat parentId
+    setState({ parent: parseParentFromToken() });
   }, []);
 
   const loginMutation = useMutation({

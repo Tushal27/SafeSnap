@@ -23,11 +23,9 @@ export const RegisterRequestSchema = z
 export const AuthResponseSchema = z.object({
   accessToken: z.string(),
   refreshToken: z.string(),
-  parent: z.object({
-    id: z.string(),
-    email: z.string(),
-    createdAt: z.string(),
-  }),
+  parentId: z.string(),
+  accessTokenExpiresInSeconds: z.number().optional(),
+  refreshTokenExpiresInSeconds: z.number().optional(),
 });
 
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
