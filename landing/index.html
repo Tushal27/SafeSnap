@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafeSnap — Protect What Matters</title>
+  <meta name="description" content="SafeSnap automatically scans your child's photos on-device and alerts you to harmful content — privately, without uploading images." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --bg: #f1f5f9;
+      --card-bg: #e8ecf1;
+      --text: #1e293b;
+      --muted: #64748b;
+      --white: #ffffff;
+      --shadow-light: rgba(255,255,255,0.8);
+      --shadow-dark: rgba(163,177,198,0.6);
+      --radius: 20px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(241,245,249,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(99,102,241,0.1);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 1.2rem; color: var(--primary);
+      text-decoration: none;
+    }
+    .nav-logo svg { width: 32px; height: 32px; }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-links a {
+      padding: 8px 16px; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 500;
+      color: var(--muted); text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-links a:hover { color: var(--primary); background: rgba(99,102,241,0.08); }
+    .btn-nav {
+      background: var(--primary); color: var(--white) !important;
+      box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+    }
+    .btn-nav:hover { background: var(--primary-dark) !important; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 1100px; margin: 0 auto;
+      padding: 96px 24px 80px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
+      color: var(--primary); font-size: 0.8rem; font-weight: 600;
+      padding: 6px 14px; border-radius: 999px; margin-bottom: 20px;
+    }
+    .hero-badge span { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 900; line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+    h1 .accent { color: var(--primary); }
+    .hero-sub {
+      margin-top: 20px; font-size: 1.1rem;
+      color: var(--muted); max-width: 480px; line-height: 1.7;
+    }
+    .hero-actions { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--primary); color: var(--white);
+      padding: 14px 28px; border-radius: 14px;
+      font-weight: 700; font-size: 1rem; text-decoration: none;
+      box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(99,102,241,0.5); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--card-bg); color: var(--text);
+      padding: 14px 28px; border-radius: 14px;
+      font-weight: 600; font-size: 1rem; text-decoration: none;
+      box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { transform: translateY(-2px); }
+
+    /* phone mockup */
+    .hero-visual {
+      display: flex; justify-content: center; align-items: center;
+    }
+    .phone {
+      width: 240px; height: 480px;
+      background: var(--card-bg);
+      border-radius: 40px;
+      box-shadow: 20px 20px 40px var(--shadow-dark), -20px -20px 40px var(--shadow-light);
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .phone-notch {
+      width: 80px; height: 24px;
+      background: var(--bg);
+      border-radius: 0 0 16px 16px;
+      margin: 0 auto;
+    }
+    .phone-screen {
+      flex: 1; padding: 16px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .phone-header {
+      font-weight: 800; font-size: 1.1rem;
+      color: var(--primary); text-align: center;
+    }
+    .phone-shield {
+      text-align: center; padding: 12px 0;
+    }
+    .phone-status {
+      background: rgba(99,102,241,0.1);
+      border-radius: 12px; padding: 10px 12px;
+      font-size: 0.7rem; color: var(--primary); font-weight: 600;
+      text-align: center;
+    }
+    .phone-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; margin-top: 4px;
+    }
+    .phone-img {
+      aspect-ratio: 1; border-radius: 6px;
+      background: var(--bg);
+      box-shadow: 2px 2px 6px var(--shadow-dark);
+      position: relative; overflow: hidden;
+    }
+    .phone-img-safe::after {
+      content:''; position:absolute; top:3px; right:3px;
+      width:10px; height:10px; border-radius:3px;
+      background:#22c55e;
+    }
+    .phone-img-flag::after {
+      content:''; position:absolute; top:3px; right:3px;
+      width:10px; height:10px; border-radius:3px;
+      background:#ef4444;
+    }
+    .phone-img svg { width:100%; height:100%; padding:8px; opacity:0.3; }
+
+    /* ── STATS ── */
+    .stats {
+      background: var(--primary);
+      padding: 48px 24px;
+    }
+    .stats-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 32px; text-align: center;
+    }
+    .stat-value {
+      font-size: 2.5rem; font-weight: 900; color: var(--white);
+      letter-spacing: -0.04em;
+    }
+    .stat-label { font-size: 0.9rem; color: rgba(255,255,255,0.75); margin-top: 4px; }
+
+    /* ── SECTION SHARED ── */
+    section { padding: 96px 24px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--primary); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800; letter-spacing: -0.03em; line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-sub { font-size: 1.05rem; color: var(--muted); max-width: 560px; }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .step {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      box-shadow: 8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+      transition: transform 0.25s;
+      position: relative;
+    }
+    .step:hover { transform: translateY(-6px); }
+    .step-number {
+      position: absolute; top: 20px; right: 24px;
+      font-size: 3.5rem; font-weight: 900;
+      color: rgba(99,102,241,0.1); line-height: 1;
+      letter-spacing: -0.04em;
+    }
+    .step-icon {
+      width: 56px; height: 56px;
+      background: rgba(99,102,241,0.1);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .step-icon svg { width: 28px; height: 28px; color: var(--primary); }
+    .step h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+    .step-connector {
+      display: none;
+    }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      margin-top: 72px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 48px;
+      box-shadow: 8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+    }
+    .flow-title {
+      text-align: center; font-weight: 800; font-size: 1.2rem;
+      margin-bottom: 40px;
+    }
+    .flow-steps {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; flex-wrap: wrap;
+    }
+    .flow-step {
+      flex: 1; min-width: 120px;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 12px; text-align: center;
+    }
+    .flow-bubble {
+      width: 64px; height: 64px;
+      background: var(--bg);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+    }
+    .flow-bubble svg { width: 28px; height: 28px; color: var(--primary); }
+    .flow-label { font-size: 0.8rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+    .flow-arrow { font-size: 1.5rem; color: var(--primary-light); flex-shrink: 0; }
+
+    /* ── FEATURES ── */
+    #features { background: var(--white); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .feature {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      box-shadow: 6px 6px 16px var(--shadow-dark), -6px -6px 16px var(--shadow-light);
+    }
+    .feature-icon {
+      width: 48px; height: 48px;
+      background: rgba(99,102,241,0.1);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .feature-icon svg { width: 24px; height: 24px; color: var(--primary); }
+    .feature h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+    .feature p { font-size: 0.85rem; color: var(--muted); }
+
+    /* ── DOWNLOAD ── */
+    #download {
+      background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+      text-align: center;
+    }
+    #download .section-title { color: var(--white); }
+    #download .section-sub { color: rgba(255,255,255,0.8); margin: 0 auto 40px; }
+    .download-card {
+      display: inline-flex; flex-direction: column; align-items: center;
+      gap: 24px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 24px;
+      padding: 40px 56px;
+      max-width: 480px;
+    }
+    .apk-info { color: rgba(255,255,255,0.9); font-size: 0.9rem; }
+    .btn-download {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--white); color: var(--primary);
+      padding: 16px 36px; border-radius: 14px;
+      font-weight: 800; font-size: 1.05rem; text-decoration: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transition: all 0.2s;
+    }
+    .btn-download:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(0,0,0,0.25); }
+    .btn-dashboard {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.9);
+      padding: 12px 24px; border-radius: 12px;
+      font-weight: 600; font-size: 0.95rem; text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.3);
+      transition: all 0.2s;
+    }
+    .btn-dashboard:hover { background: rgba(255,255,255,0.1); }
+    .requirements {
+      font-size: 0.78rem; color: rgba(255,255,255,0.6);
+      margin-top: 8px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid rgba(99,102,241,0.1);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-logo {
+      font-weight: 800; color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+      text-decoration: none; font-size: 1rem;
+    }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 0.85rem; color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--primary); }
+    .footer-copy { font-size: 0.8rem; color: var(--muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; text-align: center; padding: 64px 24px; }
+      .hero-sub { margin: 20px auto 0; }
+      .hero-actions { justify-content: center; }
+      .hero-visual { order: -1; }
+      .phone { width: 200px; height: 400px; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .stats-inner { grid-template-columns: 1fr; gap: 20px; }
+      .flow { padding: 32px 20px; }
+      .flow-steps { gap: 4px; }
+      .flow-label { font-size: 0.72rem; }
+    }
+    @media (max-width: 600px) {
+      .steps { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .nav-links .btn-nav { display: none; }
+      .download-card { padding: 32px 24px; }
+      .flow-arrow { display: none; }
+      .flow-steps { justify-content: center; gap: 16px; }
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 3L4 8v8c0 6.627 5.373 12 12 12s12-5.373 12-12V8L16 3z" fill="#6366f1"/>
+        <path d="M11 16l3 3 7-7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      SafeSnap
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#features">Features</a>
+      <a href="https://safesnap.vercel.app" target="_blank" rel="noopener">Dashboard</a>
+      <a href="#download" class="btn-nav">Download APK</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-text">
+    <div class="hero-badge">
+      <span></span>
+      Privacy-first parental protection
+    </div>
+    <h1>Keep your child<br/><span class="accent">safe online,</span><br/>privately.</h1>
+    <p class="hero-sub">
+      SafeSnap scans your child's photos <strong>on-device</strong> using AI — no images ever leave the phone. Parents get instant alerts, not screenshots.
+    </p>
+    <div class="hero-actions">
+      <a href="#download" class="btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download Free APK
+      </a>
+      <a href="https://safesnap.vercel.app" target="_blank" rel="noopener" class="btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Parent Dashboard
+      </a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-header">SafeSnap</div>
+        <div class="phone-shield">
+          <svg width="72" height="72" viewBox="0 0 32 32" fill="none">
+            <path d="M16 3L4 8v8c0 6.627 5.373 12 12 12s12-5.373 12-12V8L16 3z" fill="#6366f1" opacity="0.15"/>
+            <path d="M16 3L4 8v8c0 6.627 5.373 12 12 12s12-5.373 12-12V8L16 3z" stroke="#6366f1" stroke-width="1.5" fill="none"/>
+            <path d="M11 16l3 3 7-7" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="phone-status">✓ Device Protected</div>
+        <div style="font-size:0.65rem;color:#64748b;font-weight:600;margin-top:8px;">Recent Photos</div>
+        <div class="phone-grid">
+          <div class="phone-img phone-img-safe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </div>
+          <div class="phone-img phone-img-safe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </div>
+          <div class="phone-img phone-img-flag">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </div>
+          <div class="phone-img phone-img-safe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </div>
+          <div class="phone-img phone-img-safe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </div>
+          <div class="phone-img phone-img-safe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div>
+      <div class="stat-value">100%</div>
+      <div class="stat-label">On-device — images never leave the phone</div>
+    </div>
+    <div>
+      <div class="stat-value">&lt;1s</div>
+      <div class="stat-label">Per-image classification time</div>
+    </div>
+    <div>
+      <div class="stat-value">Free</div>
+      <div class="stat-label">No subscription, no hidden fees</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="section-inner">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Set up in under 2 minutes</h2>
+    <p class="section-sub">Six simple steps from download to protection — no technical knowledge required.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <h3>Create a Parent Account</h3>
+        <p>Sign up at the parent dashboard on any browser — desktop or mobile. Takes 30 seconds.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <h3>Generate a Pairing QR</h3>
+        <p>Go to Devices on the dashboard and tap "Pair new device". A unique QR code appears — valid for 5 minutes.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </div>
+        <h3>Install the App</h3>
+        <p>Download the SafeSnap APK on your child's Android phone. Enable "Install from unknown sources" when prompted.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <h3>Select "Child's Device"</h3>
+        <p>Open the app, tap "Child's device" and then "Scan pairing code". Point the camera at the QR code on your screen.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-number">5</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </div>
+        <h3>App Scans in the Background</h3>
+        <p>SafeSnap quietly checks photos on-device using AI every hour. No internet needed for scanning — everything stays local.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-number">6</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <h3>Parent Gets Alerted</h3>
+        <p>When flagged content is detected, the parent dashboard shows an alert with severity level — never the actual image.</p>
+      </div>
+    </div>
+
+    <!-- flow diagram -->
+    <div class="flow">
+      <div class="flow-title">The complete flow</div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2"/>
+              <line x1="12" y1="18" x2="12.01" y2="18"/>
+            </svg>
+          </div>
+          <div class="flow-label">Child's<br/>Phone</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="flow-label">On-device<br/>AI Scan</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div class="flow-label">Severity<br/>Score Only</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <div class="flow-label">Backend<br/>Alert Store</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <div class="flow-label">Parent<br/>Alert</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="flow-label">Parent<br/>Dashboard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-label">Built different</div>
+    <h2 class="section-title">Privacy by design</h2>
+    <p class="section-sub">Most parental controls upload photos to the cloud. SafeSnap never does.</p>
+
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h3>On-device AI only</h3>
+        <p>The MobileNet classifier runs entirely on the phone. No photo ever touches a server.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3>Metadata alerts only</h3>
+        <p>Only a severity score and image hash are reported — never the image itself.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <h3>Hourly background scans</h3>
+        <p>WorkManager schedules quiet scans every hour without draining the battery.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <h3>QR pairing — no code</h3>
+        <p>Secure one-time token QR code links parent and child accounts in seconds.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <h3>Severity levels</h3>
+        <p>Four tiers — Low, Medium, High, Critical — so parents know what needs immediate attention.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <h3>Real-time dashboard</h3>
+        <p>Parent web dashboard with live WebSocket alerts, device management, and alert history.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section id="download">
+  <div class="section-inner" style="display:flex;flex-direction:column;align-items:center;">
+    <div class="section-label" style="color:rgba(255,255,255,0.7);">Get started today</div>
+    <h2 class="section-title">Download SafeSnap</h2>
+    <p class="section-sub">Free forever. No account needed on the child's device — just scan and go.</p>
+    <div class="download-card">
+      <svg width="56" height="56" viewBox="0 0 32 32" fill="none">
+        <path d="M16 3L4 8v8c0 6.627 5.373 12 12 12s12-5.373 12-12V8L16 3z" fill="rgba(255,255,255,0.2)"/>
+        <path d="M16 3L4 8v8c0 6.627 5.373 12 12 12s12-5.373 12-12V8L16 3z" stroke="white" stroke-width="1.5" fill="none"/>
+        <path d="M11 16l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <a href="https://github.com/tushal27/safesnap/releases/latest/download/safesnap.apk" class="btn-download">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download APK
+        </a>
+        <p class="requirements">Android 8.0+ required &nbsp;·&nbsp; ~25 MB</p>
+      </div>
+      <div class="apk-info">Or open the parent dashboard →</div>
+      <a href="https://safesnap.vercel.app" target="_blank" rel="noopener" class="btn-dashboard">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        safesnap.vercel.app
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="#" class="footer-logo">
+      <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+        <path d="M16 3L4 8v8c0 6.627 5.373 12 12 12s12-5.373 12-12V8L16 3z" fill="#6366f1"/>
+        <path d="M11 16l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      SafeSnap
+    </a>
+    <div class="footer-links">
+      <a href="https://safesnap.vercel.app" target="_blank" rel="noopener">Parent Dashboard</a>
+      <a href="https://github.com/tushal27/safesnap" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://safesnap-backend.onrender.com/health" target="_blank" rel="noopener">API Status</a>
+    </div>
+    <div class="footer-copy">© 2026 SafeSnap. Built with privacy in mind.</div>
+  </div>
+</footer>
+
+</body>
+</html>
