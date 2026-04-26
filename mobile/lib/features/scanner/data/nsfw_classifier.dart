@@ -85,15 +85,17 @@ class NsfwClassifier {
 
     final List<List<List<List<double>>>> input = _buildInputTensor(resized);
 
-    // Output shape: [1, 2] — [safe_prob, nsfw_prob].
+    // GantMan mobilenet_v2_140_224 output shape: [1, 5]
+    // indices: 0=drawings, 1=hentai, 2=neutral, 3=porn, 4=sexy
     final List<List<double>> output = [
-      [0.0, 0.0],
+      [0.0, 0.0, 0.0, 0.0, 0.0],
     ];
 
     interpreter.run(input, output);
 
-    // Index 1 is the NSFW class probability.
-    return output[0][1].clamp(0.0, 1.0);
+    // NSFW score = sum of explicitly adult classes (hentai + porn + sexy)
+    final double nsfwScore = output[0][1] + output[0][3] + output[0][4];
+    return nsfwScore.clamp(0.0, 1.0);
   }
 
   /// Converts a decoded [img.Image] into the normalised [0, 1] float tensor
