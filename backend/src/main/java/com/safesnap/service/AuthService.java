@@ -104,18 +104,25 @@ public class AuthService {
         Parent parent = parentRepository.findById(parentId)
             .orElseThrow(() -> new ResourceNotFoundException("Parent", parentId));
 
-        if (childRepository.existsByDeviceId(request.deviceId())) {
-            throw new SafeSnapException("Device already paired", HttpStatus.CONFLICT);
+        // Upsert: if this device paired before, update it rather than reject.
+        // Allows re-pairing after app reinstall or QR refresh.
+        Child child = childRepository.findByDeviceId(request.deviceId())
+            .orElse(null);
+        if (child == null) {
+            child = Child.builder()
+                .deviceName(request.deviceName())
+                .deviceId(request.deviceId())
+                .parent(parent)
+                .lastSeenAt(Instant.now())
+                .build();
+            log.info("Pairing new child deviceId={} to parentId={}", request.deviceId(), parentId);
+        } else {
+            child.setDeviceName(request.deviceName());
+            child.setParent(parent);
+            child.setLastSeenAt(Instant.now());
+            log.info("Re-pairing existing child id={} to parentId={}", child.getId(), parentId);
         }
-
-        Child child = Child.builder()
-            .deviceName(request.deviceName())
-            .deviceId(request.deviceId())
-            .parent(parent)
-            .lastSeenAt(Instant.now())
-            .build();
         child = childRepository.save(child);
-        log.info("Paired child id={} to parentId={}", child.getId(), parentId);
 
         String accessToken  = jwtService.generateChildAccessToken(child.getId());
         String refreshToken = jwtService.generateRefreshToken(child.getId());

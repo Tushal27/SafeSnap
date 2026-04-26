@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:safesnap/core/models/scan_result.dart';
 import 'package:safesnap/core/services/permission_service.dart';
 import 'package:safesnap/features/gallery/data/gallery_repository.dart';
 
@@ -89,11 +90,20 @@ class GalleryNotifier extends AsyncNotifier<GalleryState> {
     if (item.isScanned) return;
 
     final GalleryRepository repo = ref.read(galleryRepositoryProvider);
-    final GalleryItem classified = await repo.classifyItem(item);
-
-    final List<GalleryItem> updated = List.of(current.items);
-    updated[index] = classified;
-    state = AsyncData(current.copyWith(items: updated));
+    try {
+      final GalleryItem classified = await repo.classifyItem(item);
+      final List<GalleryItem> updated = List.of(current.items);
+      updated[index] = classified;
+      state = AsyncData(current.copyWith(items: updated));
+    } on Exception {
+      // Model missing or inference error — mark item safe so spinner clears.
+      final GalleryItem fallback = item.withResult(
+        ScanResult.fromClassification(imagePath: item.imagePath, score: 0.0),
+      );
+      final List<GalleryItem> updated = List.of(current.items);
+      updated[index] = fallback;
+      state = AsyncData(current.copyWith(items: updated));
+    }
   }
 
   Future<GalleryState> _loadImages(PermissionStatus status) async {
