@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../scanner/providers/scanner_provider.dart';
@@ -53,8 +54,7 @@ class ChildDashboardScreen extends ConsumerWidget {
         ),
         IconButton(
           icon: const Icon(Icons.settings_outlined),
-          onPressed: () =>
-              Navigator.pushNamed(context, AppConstants.routeSettings),
+          onPressed: () => context.push(AppConstants.routeSettings),
           tooltip: 'Settings',
         ),
       ],
@@ -68,8 +68,7 @@ class ChildDashboardScreen extends ConsumerWidget {
           child: OutlinedButton.icon(
             icon: const Icon(Icons.photo_library_outlined),
             label: const Text('Gallery'),
-            onPressed: () =>
-                Navigator.pushNamed(context, AppConstants.routeGallery),
+            onPressed: () => context.push(AppConstants.routeGallery),
           ),
         ),
         const SizedBox(width: 12),
@@ -77,8 +76,7 @@ class ChildDashboardScreen extends ConsumerWidget {
           child: OutlinedButton.icon(
             icon: const Icon(Icons.shield_outlined),
             label: const Text('Scan status'),
-            onPressed: () =>
-                Navigator.pushNamed(context, AppConstants.routeScanStatus),
+            onPressed: () => context.push(AppConstants.routeScanStatus),
           ),
         ),
       ],

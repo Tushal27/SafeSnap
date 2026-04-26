@@ -33,6 +33,9 @@ dependencies:
   # QR scanning
   mobile_scanner: ^5.1.1
 
+  # Device info (for real device name on pairing)
+  device_info_plus: ^10.1.0
+
   # Background tasks
   workmanager: ^0.6.0
 

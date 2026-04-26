@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:safesnap/core/api/api_client.dart';
@@ -42,7 +43,7 @@ class OnboardingRepository {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String deviceId = await _ensureDeviceId(prefs);
-    final String deviceName = _getDeviceName();
+    final String deviceName = await _getDeviceName();
 
     final Response<Map<String, dynamic>> response =
         await _apiClient.dio.post<Map<String, dynamic>>(
@@ -138,13 +139,20 @@ class OnboardingRepository {
     return newId;
   }
 
-  String _getDeviceName() {
+  Future<String> _getDeviceName() async {
     try {
-      final String hostname = Platform.localHostname;
-      return hostname.isNotEmpty ? hostname : 'SafeSnap Device';
-    } catch (_) {
-      return 'SafeSnap Device';
-    }
+      final DeviceInfoPlugin plugin = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final AndroidDeviceInfo info = await plugin.androidInfo;
+        final String name =
+            '${info.manufacturer} ${info.model}'.trim();
+        return name.isNotEmpty ? name : 'Android Device';
+      } else if (Platform.isIOS) {
+        final IosDeviceInfo info = await plugin.iosInfo;
+        return info.name.isNotEmpty ? info.name : 'iPhone';
+      }
+    } catch (_) {}
+    return 'SafeSnap Device';
   }
 
   String _generateUuidV4() {
