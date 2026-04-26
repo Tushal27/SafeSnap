@@ -122,15 +122,23 @@ class _ParentRegistrationView extends HookConsumerWidget {
     final TextEditingController passwordController =
         useTextEditingController();
     final ValueNotifier<bool> obscurePassword = useState(true);
+    final ValueNotifier<bool> isSignIn = useState(false);
     final GlobalKey<FormState> formKey =
         useMemoized(GlobalKey<FormState>.new);
 
     Future<void> handleSubmit() async {
       if (!formKey.currentState!.validate()) return;
-      await ref.read(onboardingProvider.notifier).registerParent(
-            email: emailController.text.trim(),
-            password: passwordController.text,
-          );
+      final String email = emailController.text.trim();
+      final String password = passwordController.text;
+      if (isSignIn.value) {
+        await ref
+            .read(onboardingProvider.notifier)
+            .loginParent(email: email, password: password);
+      } else {
+        await ref
+            .read(onboardingProvider.notifier)
+            .registerParent(email: email, password: password);
+      }
       final OnboardingState state = ref.read(onboardingProvider);
       if (state.isPaired && context.mounted) {
         context.go(AppConstants.routeDashboard);
@@ -155,14 +163,16 @@ class _ParentRegistrationView extends HookConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Create parent account',
+              isSignIn.value ? 'Sign in' : 'Create parent account',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Your account lets you review alerts across all paired devices.',
+              isSignIn.value
+                  ? 'Welcome back. Sign in to access your dashboard.'
+                  : 'Your account lets you review alerts across all paired devices.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -217,7 +227,19 @@ class _ParentRegistrationView extends HookConsumerWidget {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Create account'),
+                  : Text(isSignIn.value ? 'Sign in' : 'Create account'),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () {
+                isSignIn.value = !isSignIn.value;
+                ref.read(onboardingProvider.notifier).clearError();
+              },
+              child: Text(
+                isSignIn.value
+                    ? "Don't have an account? Create one"
+                    : 'Already have an account? Sign in',
+              ),
             ),
           ],
         ),

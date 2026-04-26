@@ -70,7 +70,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: _friendlyError(e),
+        error: _friendlyPairingError(e),
       );
     }
   }
@@ -89,23 +89,67 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: _friendlyError(e),
+        error: _friendlyRegistrationError(e),
+      );
+    }
+  }
+
+  /// Called on parent sign-in form submit.
+  Future<void> loginParent({
+    required String email,
+    required String password,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final OnboardingRepository repo =
+          ref.read(onboardingRepositoryProvider);
+      await repo.loginParent(email: email, password: password);
+      state = state.copyWith(isLoading: false, isPaired: true);
+    } on Exception catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: _friendlyLoginError(e),
       );
     }
   }
 
   void clearError() => state = state.copyWith(error: null);
 
-  String _friendlyError(Exception e) {
+  String _friendlyRegistrationError(Exception e) {
     final String msg = e.toString();
-    if (msg.contains('SocketException') ||
-        msg.contains('Connection refused')) {
+    if (msg.contains('SocketException') || msg.contains('Connection refused')) {
+      return 'Cannot reach server. Check your connection and try again.';
+    }
+    if (msg.contains('409') || msg.contains('Conflict')) {
+      return 'An account with that email already exists. Sign in instead.';
+    }
+    if (msg.contains('400')) {
+      return 'Invalid email or password format.';
+    }
+    return 'Registration failed. Please try again.';
+  }
+
+  String _friendlyLoginError(Exception e) {
+    final String msg = e.toString();
+    if (msg.contains('SocketException') || msg.contains('Connection refused')) {
       return 'Cannot reach server. Check your connection and try again.';
     }
     if (msg.contains('401') || msg.contains('Unauthorized')) {
-      return 'Invalid pairing code. Please try again.';
+      return 'Wrong email or password. Please try again.';
     }
-    return 'Something went wrong. Please try again.';
+    return 'Sign in failed. Please try again.';
+  }
+
+  String _friendlyPairingError(Exception e) {
+    final String msg = e.toString();
+    if (msg.contains('SocketException') || msg.contains('Connection refused')) {
+      return 'Cannot reach server. Check your connection and try again.';
+    }
+    if (msg.contains('400') || msg.contains('404') ||
+        msg.contains('Unauthorized')) {
+      return 'Invalid or expired pairing code. Please scan a fresh QR code.';
+    }
+    return 'Pairing failed. Please try again.';
   }
 }
 
