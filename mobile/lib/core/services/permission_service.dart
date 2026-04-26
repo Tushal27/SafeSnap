@@ -1,4 +1,5 @@
 import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart' as ph;
 
 /// Wraps [permission_handler] to provide typed, testable permission checks.
 class PermissionService {
@@ -35,5 +36,5 @@ class PermissionService {
 
   /// Opens the operating system app settings screen so the user can manually
   /// grant a permanently denied permission.
-  Future<bool> openAppSettings() => openAppSettings();
+  Future<bool> openAppSettings() => ph.openAppSettings();
 }

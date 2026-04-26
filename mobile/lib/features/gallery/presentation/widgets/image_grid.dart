@@ -72,7 +72,7 @@ class _ImageCellState extends State<_ImageCell> {
       fit: StackFit.expand,
       children: [
         _ImageTile(path: widget.item.imagePath),
-        if (widget.item.isScanned)
+        if (widget.item.isScanned && widget.item.scanResult != null)
           Align(
             alignment: Alignment.topRight,
             child: _SeverityBadge(
