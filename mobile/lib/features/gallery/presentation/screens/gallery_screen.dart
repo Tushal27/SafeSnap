@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:safesnap/features/gallery/data/gallery_repository.dart';
 import 'package:safesnap/features/gallery/presentation/widgets/image_grid.dart';
 import 'package:safesnap/features/gallery/presentation/widgets/permission_prompt.dart';
 import 'package:safesnap/features/gallery/providers/gallery_provider.dart';
