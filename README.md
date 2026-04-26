@@ -8,11 +8,10 @@ SafeSnap is a full-stack parental control system built around a single privacy g
 
 | | URL |
 |---|---|
+| **Landing page** | https://safesnap-app.vercel.app |
 | **Parent dashboard** | https://safesnap.vercel.app |
 | **Backend API** | https://safesnap-backend.onrender.com |
-| **Health check** | https://safesnap-backend.onrender.com/health |
-
-> The backend runs on Render's free tier and may take ~30 seconds to wake on first request.
+| **Android APK** | [Latest release](https://github.com/Tushal27/SafeSnap/releases/latest) |
 
 ---
 
