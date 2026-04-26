@@ -87,6 +87,29 @@ class OnboardingRepository {
     return RegistrationResult(jwt: accessToken, email: email);
   }
 
+  /// Logs in an existing parent account.
+  ///
+  /// Throws [DioException] on network or server errors, including 401 for
+  /// wrong credentials.
+  Future<RegistrationResult> loginParent({
+    required String email,
+    required String password,
+  }) async {
+    final Response<Map<String, dynamic>> response =
+        await _apiClient.dio.post<Map<String, dynamic>>(
+      ApiRoutes.login,
+      data: {'email': email, 'password': password},
+    );
+
+    final Map<String, dynamic> data = response.data!;
+    final String accessToken = data['accessToken'] as String;
+
+    await _apiClient.persistToken(accessToken);
+    await _persistParentPrefs(email);
+
+    return RegistrationResult(jwt: accessToken, email: email);
+  }
+
   /// Returns true if this device has already been paired/registered.
   Future<bool> isOnboardingComplete() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
