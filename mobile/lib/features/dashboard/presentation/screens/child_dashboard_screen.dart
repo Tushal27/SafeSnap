@@ -16,7 +16,7 @@ class ChildDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scanAsyncValue = ref.watch(scannerProvider);
-    final scanState = scanAsyncValue.valueOrNull;
+    final scanState = scanAsyncValue.value;
     final theme = Theme.of(context);
 
     return Scaffold(

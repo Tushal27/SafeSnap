@@ -79,7 +79,7 @@ class ScannerNotifier extends AsyncNotifier<ScanState> {
 
   /// Starts a full foreground scan and updates state incrementally.
   Future<void> startScan() async {
-    final ScanState current = state.valueOrNull ?? const ScanState();
+    final ScanState current = state.value ?? const ScanState();
     if (current.isScanning) return;
 
     state = AsyncData(current.copyWith(
@@ -97,7 +97,7 @@ class ScannerNotifier extends AsyncNotifier<ScanState> {
       await classifier.loadModel();
 
       final DateTime? lastScan =
-          state.valueOrNull?.lastScanTime;
+          state.value?.lastScanTime;
       final List<String> paths =
           await repository.getRecentImages(since: lastScan);
 

@@ -82,7 +82,7 @@ class GalleryNotifier extends AsyncNotifier<GalleryState> {
   /// Classifies a single item and updates it in the list in-place.
   Future<void> classifyItem(int index) async {
     final GalleryState current =
-        state.valueOrNull ?? const GalleryState();
+        state.value ?? const GalleryState();
     if (index < 0 || index >= current.items.length) return;
 
     final GalleryItem item = current.items[index];

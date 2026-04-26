@@ -13,19 +13,19 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
   }
 
   Future<void> updateSensitivityThreshold(double value) async {
-    final AppSettings current = state.valueOrNull ?? AppSettings.defaults;
+    final AppSettings current = state.value ?? AppSettings.defaults;
     final AppSettings updated =
         current.copyWith(sensitivityThreshold: value.clamp(0.5, 0.95));
     await _persist(updated);
   }
 
   Future<void> updateParentEmail(String email) async {
-    final AppSettings current = state.valueOrNull ?? AppSettings.defaults;
+    final AppSettings current = state.value ?? AppSettings.defaults;
     await _persist(current.copyWith(parentEmail: email));
   }
 
   Future<void> updateSyncFrequency(int minutes) async {
-    final AppSettings current = state.valueOrNull ?? AppSettings.defaults;
+    final AppSettings current = state.value ?? AppSettings.defaults;
     final AppSettings updated =
         current.copyWith(syncFrequencyMinutes: minutes);
     await _persist(updated);
